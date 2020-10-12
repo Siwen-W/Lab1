@@ -13,59 +13,56 @@ import java.util.Map;
 
 public class FastaSequence 
 {
+	private String header;
 	private String s1;
 	
-	public FastaSequence(String s1)
+	public FastaSequence(String header,String s1)
 	{
+		this.header=header;
 		this.s1=s1;
 	}
 	
 	public String getHeader()
 	{
-		int a=s1.indexOf('>');
-		int b=s1.indexOf(' ');
-		return s1.substring(a+1,b);
+		return header;
 	}
 	
 	public String getSequence() 
 	{
-		int a=s1.indexOf(' ');
-		return s1.substring(a+1,s1.length());
+		return s1;
 	}
 	
 	public float getGCRatio()
 	{
-		int a=s1.indexOf(' ');
-		String b=s1.substring(a+1,s1.length());
-		float i=b.length();
-		float numC=b.chars().filter(ch->ch=='C').count();
-		float numG=b.chars().filter(ch->ch=='G').count();
-		return (numC+numG)/i;
+		float numC=s1.chars().filter(ch->ch=='C').count();
+		float numG=s1.chars().filter(ch->ch=='G').count();
+		return (numC+numG)/s1.length();
 	}
 	
 	public static List<FastaSequence> readFastaFile(String filepath) throws Exception 
 	{
 		BufferedReader r=new BufferedReader(new FileReader(new File(filepath)));
 		List<FastaSequence> l=new ArrayList<FastaSequence>();
+		String header="";
 		String s="";
 		for(String nextline=r.readLine();nextline!=null;nextline=r.readLine())
 		{
+			nextline=nextline.replace("\n","");
 			if(nextline.charAt(0)!='>')
 			{
-				nextline=nextline.replace("\n","");
 				s=s+nextline;
 			}
 			else
 			{
 				if(!s.equals(""))
 				{
-					l.add(new FastaSequence(s));
+					l.add(new FastaSequence(header,s));
 				}
+				header=nextline.substring(1, nextline.length());
 				s="";
-				s=s+nextline+" ";
 			}
 		}
-		l.add(new FastaSequence(s));
+		l.add(new FastaSequence(header,s));
 		r.close();
 		return l;
 	}

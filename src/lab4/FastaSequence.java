@@ -14,9 +14,9 @@ import java.util.Map;
 public class FastaSequence 
 {
 	private String header;
-	private String s1;
+	private StringBuffer s1;
 	
-	public FastaSequence(String header,String s1)
+	public FastaSequence(String header,StringBuffer s1)
 	{
 		this.header=header;
 		this.s1=s1;
@@ -27,7 +27,7 @@ public class FastaSequence
 		return header;
 	}
 	
-	public String getSequence() 
+	public StringBuffer getSequence() 
 	{
 		return s1;
 	}
@@ -44,23 +44,26 @@ public class FastaSequence
 		BufferedReader r=new BufferedReader(new FileReader(new File(filepath)));
 		List<FastaSequence> l=new ArrayList<FastaSequence>();
 		String header="";
-		String s="";
+		StringBuffer s=null;
 		for(String nextline=r.readLine();nextline!=null;nextline=r.readLine())
 		{
-			nextline=nextline.replace("\n","");
-			if(nextline.charAt(0)!='>')
+			if(!nextline.equals(""))
 			{
-				s=s+nextline;
-			}
-			else
-			{
-				if(!s.equals(""))
+				nextline=nextline.replace("\n","");
+				if(nextline.charAt(0)!='>')
 				{
-					l.add(new FastaSequence(header,s));
+					s.append(nextline);
 				}
-				header=nextline.substring(1, nextline.length());
-				s="";
-			}
+				else
+				{
+					if(s!=null)
+					{
+						l.add(new FastaSequence(header,s));
+					}
+					header=nextline.substring(1, nextline.length());
+					s=new StringBuffer();
+				}
+			}			
 		}
 		l.add(new FastaSequence(header,s));
 		r.close();
@@ -69,24 +72,20 @@ public class FastaSequence
 	
 	public static void writeUnique(File inFile,File outFile) throws Exception
 	{
-		BufferedReader r=new BufferedReader(new FileReader(inFile));
-		Map<String,Integer> map=new HashMap<String,Integer>();
-		List<String> l=new ArrayList<>(); 
-		for(String nextline=r.readLine();nextline!=null;nextline=r.readLine())
+		List<FastaSequence> fa=FastaSequence.readFastaFile(inFile.getAbsolutePath());
+		Map<String,Integer> map=new HashMap<String,Integer>(); 
+		List<String> l=new ArrayList<>();
+		for(FastaSequence fs:fa)
 		{
-			if(nextline.charAt(0)!='>')
+			StringBuffer s=fs.getSequence();
+			Integer count=map.get(s.toString());
+			if(count==null)
 			{
-				nextline=nextline.replace("\n","");
-				Integer count=map.get(nextline);
-				if(count==null)
-				{
-					count=0;
-				}
-				count++;
-				map.put(nextline,count);
+				count=0;
 			}
+			count++;
+			map.put(s.toString(),count);
 		}
-		r.close();
 		BufferedWriter writer=new BufferedWriter(new FileWriter(outFile));
 		for(String x:map.keySet())
 		{
@@ -114,6 +113,7 @@ public class FastaSequence
 			System.out.println(fs.getHeader());
 			System.out.println(fs.getSequence());
 			System.out.println(fs.getGCRatio());
+		
 		}
 		
 		File x=new File("/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab4/input.fasta");

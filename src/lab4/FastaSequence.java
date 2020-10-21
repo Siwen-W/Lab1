@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -74,7 +75,6 @@ public class FastaSequence
 	{
 		List<FastaSequence> fa=FastaSequence.readFastaFile(inFile.getAbsolutePath());
 		Map<String,Integer> map=new HashMap<String,Integer>(); 
-		List<String> l=new ArrayList<>();
 		for(FastaSequence fs:fa)
 		{
 			StringBuffer s=fs.getSequence();
@@ -87,19 +87,19 @@ public class FastaSequence
 			map.put(s.toString(),count);
 		}
 		BufferedWriter writer=new BufferedWriter(new FileWriter(outFile));
-		for(String x:map.keySet())
-		{
-			Integer y=map.get(x);
-			String a=Integer.toString(y)+" "+x;
-			l.add(a);
-		}
+		List<Integer> l=new ArrayList<Integer>(new HashSet<>(map.values()));
 		Collections.sort(l);
-		for(String i:l)
+		for(int i=0;i<l.size();i++)
 		{
-			int b=i.indexOf(' ');
-			String number=i.substring(0, b);
-			String sequence=i.substring(b+1, i.length());
-			writer.write(">"+number+"\n"+sequence+"\n");
+			for(String x:map.keySet())
+			{
+				Integer y=map.get(x);
+				if(y==l.get(i))
+				{
+					System.out.print(y);
+					writer.write(">"+y+"\n"+x+"\n");
+				}
+			}
 		}
 		writer.flush();
 		writer.close();
@@ -116,7 +116,7 @@ public class FastaSequence
 		
 		}
 		
-		File x=new File("/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab4/input.fasta");
+		File x=new File("/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab4/sampleFasta.txt");
 		File y=new File("/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab4/output.txt");
 		writeUnique(x,y);
 		

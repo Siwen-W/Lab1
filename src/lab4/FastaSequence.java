@@ -96,7 +96,6 @@ public class FastaSequence
 				Integer y=map.get(x);
 				if(y==l.get(i))
 				{
-					System.out.print(y);
 					writer.write(">"+y+"\n"+x+"\n");
 				}
 			}

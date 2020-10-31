@@ -102,7 +102,6 @@ public class MyGUI extends JFrame
 							a1="";
 							c="Results:"+"\n"+"The name "+a+" is not in PDB.";
 						}
-						updatefield();
 					}
 				}
 		);

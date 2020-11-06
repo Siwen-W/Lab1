@@ -105,9 +105,9 @@ public class Amino_acid_quiz extends JFrame
 				int time=30;
 				while(time>=0 && !canceled)
 				{
-					String s=afield.getText().toUpperCase();
 					bfield.setText(whole+"Time left: "+time+"s");
 					validate();
+					String s=afield.getText().toUpperCase();
 					if(!s.equals(""))
 					{
 						if(s.equals(short_AA[j]))

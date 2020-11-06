@@ -17,10 +17,9 @@ public class Amino_acid_quiz extends JFrame
 	private static final long serialVersionUID = 97594027530354791L;
 	private JTextField afield=new JTextField();
 	private JTextArea bfield=new JTextArea();
-	long start_time=0;
-	long time=0;
 	int right=0;
 	int wrong=0;
+	boolean canceled=false;
 	String whole_AA [] = {"alanine","arginine","asparagine", 
 			"aspartic acid","cysteine","glutamine",
 			"glutamic acid","glycine","histidine",
@@ -48,83 +47,40 @@ public class Amino_acid_quiz extends JFrame
 	private void updatefield() 
 	{
 		bfield.setText(whole);
-		bfield.setLineWrap(true);
-		bfield.setWrapStyleWord(true);
 		validate();
 	}
 	
 	private JPanel getBottomPanel()
 	{
 		JPanel panel=new JPanel();
-		panel.setLayout(new GridLayout(0,3));
+		panel.setLayout(new GridLayout(0,2));
 		JButton start=new JButton("Start quiz");
-		JButton enter=new JButton("Enter");
 		JButton cancel=new JButton("Cancel");
 		panel.add(start);
-		panel.add(enter);
 		panel.add(cancel);
+		cancel.setEnabled(false);
 		start.addActionListener(new ActionListener() 
 		{
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				right=0;
-				wrong=0;
-				time=0;
+				canceled=false;
 				j=getAA();
+				afield.setText("");
 				whole="Please input the short name of \'"+whole_AA[j]+"\' in the box above."+"\n"
 						+"\n"+"Results:"+"\n"+"Right number: "+right+"\n"+"Wrong number: "+wrong
-						+"\n"+"Time left: "+(30-time)+"s";
-				enter.setEnabled(true);
+						+"\n";
+				new Thread(new Mythread()).start();
 				cancel.setEnabled(true);
-				updatefield();
-				start_time=System.currentTimeMillis()/1000;
 			}
-		});
-		enter.addActionListener(new ActionListener() 
-		{
-			@Override
-			public void actionPerformed(ActionEvent e) 
-			{
-				long current_time=System.currentTimeMillis()/1000;
-				time=current_time-start_time;
-				if(time<=30)
-				{
-					String s=afield.getText().toUpperCase();
-					if(s.equals(short_AA[j]))
-					{
-						right++;
-					}
-					else
-					{
-						wrong++;
-					}
-					j=getAA();
-					whole="Please input the short name of \'"+whole_AA[j]+"\' in the box above."+"\n"
-							+"\n"+"Results:"+"\n"+"Right number: "+right+"\n"+"Wrong number: "+wrong
-							+"\n"+"Time left: "+(30-time)+"s";
-					updatefield();
-				}
-				else
-				{
-					whole="Time out! Please click on \'Start quiz\' to start again."
-							+"\n"+"\n"+"Results:"+"\n"+"Right number: "+right+"\n"+"Wrong number: "+wrong;
-					enter.setEnabled(false);
-					cancel.setEnabled(false);
-					updatefield();
-				}	
-			}
-		});
+		});		
 		cancel.addActionListener(new ActionListener() 
 		{
 			@Override
 			public void actionPerformed(ActionEvent e) 
 			{
-				right=0;
-				wrong=0;
-				time=0;
+				canceled=true;
 				whole="You have cancelled this process! Please click on \'Start quiz\' to start again.";
-				enter.setEnabled(false);
 				cancel.setEnabled(false);
 				updatefield();
 			}
@@ -139,8 +95,59 @@ public class Amino_acid_quiz extends JFrame
 		return i;
 	}
 	
+	private class Mythread implements Runnable
+	{
+		@Override
+		public void run() 
+		{
+			try
+			{
+				int time=30;
+				while(time>=0 && !canceled)
+				{
+					String s=afield.getText().toUpperCase();
+					bfield.setText(whole+"Time left: "+time+"s");
+					validate();
+					if(!s.equals(""))
+					{
+						if(s.equals(short_AA[j]))
+						{
+							right++;
+						}
+						else
+						{
+							wrong++;
+						}
+						j=getAA();
+						whole="Please input the short name of \'"+whole_AA[j]+"\' in the box above."+"\n"
+								+"\n"+"Results:"+"\n"+"Right number: "+right+"\n"+"Wrong number: "+wrong
+								+"\n";
+						afield.setText("");
+					}
+					time--;
+					Thread.sleep(1000);
+				}
+				if(time<=0)
+				{
+					whole="Time out! Please click on \'Start quiz\' to start again."
+							+"\n"+"\n"+"Results:"+"\n"+"Right number: "+right+"\n"+"Wrong number: "+wrong;	
+					updatefield();
+				}
+			}
+			catch(Exception ex)
+			{
+				ex.printStackTrace();
+			}
+			right=0;
+			wrong=0;
+		}
+		
+	}
+	
 	public static void main(String[] args) 
 	{
 		new Amino_acid_quiz("Amino acid quiz");
 	}
+	
 }
+

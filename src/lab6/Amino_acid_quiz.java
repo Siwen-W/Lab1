@@ -17,6 +17,8 @@ public class Amino_acid_quiz extends JFrame
 	private static final long serialVersionUID = 97594027530354791L;
 	private JTextField afield=new JTextField();
 	private JTextArea bfield=new JTextArea();
+	JButton start=new JButton("Start quiz");
+	JButton cancel=new JButton("Cancel");
 	int right=0;
 	int wrong=0;
 	boolean canceled=false;
@@ -54,8 +56,6 @@ public class Amino_acid_quiz extends JFrame
 	{
 		JPanel panel=new JPanel();
 		panel.setLayout(new GridLayout(0,2));
-		JButton start=new JButton("Start quiz");
-		JButton cancel=new JButton("Cancel");
 		panel.add(start);
 		panel.add(cancel);
 		cancel.setEnabled(false);
@@ -72,6 +72,7 @@ public class Amino_acid_quiz extends JFrame
 						+"\n";
 				new Thread(new Mythread()).start();
 				cancel.setEnabled(true);
+				start.setEnabled(false);
 			}
 		});		
 		cancel.addActionListener(new ActionListener() 
@@ -81,7 +82,6 @@ public class Amino_acid_quiz extends JFrame
 			{
 				canceled=true;
 				whole="You have cancelled this process! Please click on \'Start quiz\' to start again.";
-				cancel.setEnabled(false);
 				updatefield();
 			}
 		});
@@ -140,6 +140,8 @@ public class Amino_acid_quiz extends JFrame
 			}
 			right=0;
 			wrong=0;
+			start.setEnabled(true);
+			cancel.setEnabled(false);
 		}
 		
 	}
@@ -150,4 +152,3 @@ public class Amino_acid_quiz extends JFrame
 	}
 	
 }
-

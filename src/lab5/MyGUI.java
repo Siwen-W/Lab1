@@ -23,16 +23,27 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
 public class MyGUI extends JFrame
 {
 	private static final long serialVersionUID = -3021357346697227441L;
-	private JTextPane afield=new JTextPane();
-	private JTextArea bfield=new JTextArea();
+	private JTextField input_field=new JTextField();
+	JScrollPane show_all_input=new JScrollPane(input_field);
+	private JTextArea result_field=new JTextArea("Please input the protein name of PDB"
+			+" or protein sequence in the box above."+"\n"+
+			"If the input is protein name, please click on \'Search by Name\'."+"\n"
+			+"If the input is protein sequence, please click on \'Search by Sequence\'.");
+	private JTextPane picture_field=new JTextPane();
 	private String a1="";
 	private String c="";
+	JButton name=new JButton("Search by Name");
+	JButton picture=new JButton("Picture result");
+	JButton sequence=new JButton("Search by Sequence");
+	Map<String,String> database=getDatabase();
 	public MyGUI(String title)
 	{
 		super(title);
@@ -40,7 +51,8 @@ public class MyGUI extends JFrame
 		setSize(800,600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout());
-		getContentPane().add(bfield,BorderLayout.CENTER);
+		getContentPane().add(show_all_input,BorderLayout.NORTH);
+		getContentPane().add(result_field,BorderLayout.CENTER);
 		setJMenuBar(getMyMenuBar());
 		getContentPane().add(getBottomPanel(),BorderLayout.SOUTH);
 		setVisible(true);
@@ -48,21 +60,21 @@ public class MyGUI extends JFrame
 	
 	private void updatefield() 
 	{
-		bfield.setText(c);
-		bfield.setLineWrap(true);
-		bfield.setWrapStyleWord(true);
+		result_field.setText(c);
+		result_field.setLineWrap(true);
+		result_field.setWrapStyleWord(true);
 		validate();
 	}
 	
 	private void updatepicture()
 	{
-		getContentPane().add(afield,BorderLayout.CENTER);
-		afield.setText("");
+		getContentPane().add(picture_field,BorderLayout.CENTER);
+		picture_field.setText("");
 		try 
 		{
 			ImageIcon icon=new ImageIcon(a1);
-			afield.insertIcon(icon);
-			afield.requestFocus();
+			picture_field.insertIcon(icon);
+			picture_field.requestFocus();
 		}
 		catch(Exception ex)
 		{
@@ -75,22 +87,18 @@ public class MyGUI extends JFrame
 	{
 		JPanel panel=new JPanel();
 		panel.setLayout(new GridLayout(0,4));
-		JButton name=new JButton("search by name");
-		JButton result=new JButton("Text result");
-		JButton picture=new JButton("Picture result");
-		JButton sequence=new JButton("search by sequence");
 		panel.add(name);
-		panel.add(result);
 		panel.add(picture);
 		panel.add(sequence);
+		picture.setEnabled(false);
 		name.addActionListener(
 				new ActionListener() 
 				{
 					@Override
 					public void actionPerformed(ActionEvent e)
 					{
-						String a=bfield.getText();
-						Map<String,String> database=getDatabase();
+						picture.setEnabled(true);
+						String a=input_field.getText();
 						String b=database.get(a);
 						if(b!=null) 
 						{
@@ -102,17 +110,10 @@ public class MyGUI extends JFrame
 							a1="";
 							c="Results:"+"\n"+"The name "+a+" is not in PDB.";
 						}
+						updatefield();
 					}
 				}
 		);
-		result.addActionListener(new ActionListener() 
-		{
-			@Override
-			public void actionPerformed(ActionEvent e) 
-			{
-				updatefield();
-			}
-		});
 		picture.addActionListener(new ActionListener() 
 		{
 			@Override
@@ -129,7 +130,7 @@ public class MyGUI extends JFrame
 		Map<String,String> map=new HashMap<String,String>();
 		try
 		{
-			BufferedReader r=new BufferedReader(new FileReader(new File("/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab5/test.txt")));
+			BufferedReader r=new BufferedReader(new FileReader(new File("/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab5/protein.fa")));
 			String header="";
 			for(String nextline=r.readLine();nextline!=null;nextline=r.readLine())
 			{

@@ -11,7 +11,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
@@ -122,7 +124,69 @@ public class MyGUI extends JFrame
 				updatepicture();
 			}
 		});
+		sequence.addActionListener(new ActionListener() 
+		{
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				picture.setEnabled(true);
+				String a=input_field.getText();
+				Map<String,String> blast=myblast(a);
+				for(String x:blast.keySet())
+				{
+					a1=x;
+					c=blast.get(a1);
+					updatefield();
+				}
+			}
+		});
 		return panel;
+	}
+	
+	//Needleman-Wunsch global alignment algorithm.
+	private Map<String,String> myblast(String input)
+	{
+		int gap=-6;
+		int match=4;
+		int mismatch=-4;
+		List<String> l=new ArrayList<>();
+		Map<String,String> mymap=new HashMap<String,String>();
+		Map<String,String> database1=new HashMap<String,String>();
+		for(String i:database.keySet())
+		{
+			String j=database.get(i);
+			database1.put(j,i);
+		}
+		int query_length=input.length();
+		int score=gap;
+		String query_change="";
+		String database_change="";
+		for(String i:database1.keySet())
+		{
+			int database_length=i.length();
+			int array [][]=new int[query_length][database_length];
+			String a=database1.get(i);
+			for(int x=0;x<query_length;x++)
+			{
+				array[x][0]=x*gap;
+			}
+			for(int x=0;x<database_length;x++)
+			{
+				array[0][x]=x*gap;
+			}
+			l.add(Integer.toString(score));
+			l.add(i);
+			l.add(query_change);
+			l.add(database_change);
+			l.add(a);
+			
+		}
+		String a1="/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab5/"+l.get(4)+".jpeg";
+		String c="Results:"+"\n"+"Query sequence: "+input+"\n"+"Best hit sequence in PDB: "
+		+l.get(1)+"\n"+"Best hit sequence's name in PDB: "+l.get(4)+"\n"+"Details of alignment: "+"\n"+l.get(2)+"(query sequence)"
+		+"\n"+l.get(3)+"(best hit sequence in PDB)"+"\n";
+		mymap.put(a1,c);
+		return mymap;
 	}
 	
 	private static Map<String,String> getDatabase() 

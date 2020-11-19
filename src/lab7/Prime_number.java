@@ -10,6 +10,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -18,6 +19,7 @@ public class Prime_number extends JFrame
 	private static final long serialVersionUID = 458400600141951672L;
 	private JTextField input=new JTextField();
 	private JTextArea result=new JTextArea();
+	private JScrollPane result1=new JScrollPane(result);
 	JButton start=new JButton("Start");
 	JButton cancel=new JButton("Cancel");
 	JButton ok=new JButton("OK");
@@ -31,7 +33,7 @@ public class Prime_number extends JFrame
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(input,BorderLayout.NORTH);
-		getContentPane().add(result,BorderLayout.CENTER);
+		getContentPane().add(result1,BorderLayout.CENTER);
 		getContentPane().add(getBottomPanel(),BorderLayout.SOUTH);
 		setVisible(true);
 	}
@@ -39,8 +41,6 @@ public class Prime_number extends JFrame
 	private void updatefield() 
 	{
 		result.setText(info);
-		result.setLineWrap(true);
-		result.setWrapStyleWord(true);
 		validate();
 	}
 	
@@ -114,6 +114,7 @@ public class Prime_number extends JFrame
 				String s=input.getText();
 				int number=Integer.parseInt(s);
 				int time=0;
+				int number1=0;
 				List<Integer> l=new ArrayList<>();
 				if(number==0 || number==1)
 				{
@@ -125,49 +126,39 @@ public class Prime_number extends JFrame
 				}
 				else
 				{
-					if(number==2)
+					int i=2;
+					while(i<=number && !cancelled)
 					{
-						info="Prime number: "+"2"+"\n";
+						int r=getPrime(i);
+						if(r!=0)
+						{
+							l.add(r);
+							number1++;
+						}
+						info="Found "+number1+" prime numbers in "+time+" seconds."+"\n";
 						updatefield();
-						start.setEnabled(true);
-						ok.setEnabled(false);
-						cancel.setEnabled(false);
+						i++;
+						time++;
+						Thread.sleep(1000);
+					}
+					start.setEnabled(true);
+					ok.setEnabled(false);
+					cancel.setEnabled(false);
+					info="";
+					for(int a=0;a<l.size();a++)
+					{
+						int x=l.get(a);
+						info+=x+""+"\n";
+					}
+					if(cancelled)
+					{
+						info+="Cancelled!"+"\n"+"Time = "+time+" seconds"+"\n";
+						updatefield();
 					}
 					else
 					{
-						int i=3;
-						while(i<=number && !cancelled)
-						{
-							int r=getPrime(i);
-							if(r!=0)
-							{
-								l.add(r);
-								info="Found "+r+" of "+number+" in "+time+" seconds."+"\n";
-								updatefield();
-							}
-							i++;
-							time++;
-							Thread.sleep(1000);
-						}
-						start.setEnabled(true);
-						ok.setEnabled(false);
-						cancel.setEnabled(false);
-						info="";
-						for(int a=0;a<l.size();a++)
-						{
-							int x=l.get(a);
-							info+=x+""+"\n";
-						}
-						if(cancelled)
-						{
-							info+="Cancelled!"+"\n"+"Time = "+time+" seconds"+"\n";
-							updatefield();
-						}
-						else
-						{
-							info+="Found all!"+"\n"+"Time = "+time+" seconds"+"\n";
-							updatefield();
-						}
+						info+="Found all!"+"\n"+"Time = "+time+" seconds"+"\n";
+						updatefield();
 					}
 				}
 				

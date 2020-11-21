@@ -11,9 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
@@ -39,6 +37,7 @@ public class MyGUI extends JFrame
 			+" or protein sequence in the box above."+"\n"+
 			"If the input is protein name, please click on \'Search by Name\'."+"\n"
 			+"If the input is protein sequence, please click on \'Search by Sequence\'.");
+	private JScrollPane show_all_result=new JScrollPane(result_field);
 	private JTextPane picture_field=new JTextPane();
 	private String a1="";
 	private String c="";
@@ -54,17 +53,17 @@ public class MyGUI extends JFrame
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(show_all_input,BorderLayout.NORTH);
-		getContentPane().add(result_field,BorderLayout.CENTER);
+		getContentPane().add(show_all_result,BorderLayout.CENTER);
 		setJMenuBar(getMyMenuBar());
 		getContentPane().add(getBottomPanel(),BorderLayout.SOUTH);
+		show_all_input.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		show_all_result.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		setVisible(true);
 	}
 	
 	private void updatefield() 
 	{
 		result_field.setText(c);
-		result_field.setLineWrap(true);
-		result_field.setWrapStyleWord(true);
 		validate();
 	}
 	
@@ -127,66 +126,95 @@ public class MyGUI extends JFrame
 		sequence.addActionListener(new ActionListener() 
 		{
 			@Override
-			public void actionPerformed(ActionEvent e) 
+			public void actionPerformed(ActionEvent e)
 			{
 				picture.setEnabled(true);
 				String a=input_field.getText();
-				Map<String,String> blast=myblast(a);
-				for(String x:blast.keySet())
+				try
 				{
-					a1=x;
-					c=blast.get(a1);
+					BufferedWriter w=new BufferedWriter(new FileWriter("/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab5/query.fa"));
+					w.write(">"+"input_query"+"\n"+a+"\n");
+					w.flush();
+					w.close();
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
+				}
+				String[] blast_a1=new String[7];
+				blast_a1[0]="/usr/local/ncbi/blast/bin/makeblastdb";
+				blast_a1[1]="-in";
+				blast_a1[2]="/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab5/protein.fa";
+				blast_a1[3]="-dbtype"; 
+				blast_a1[4]="prot";
+				blast_a1[5]="-out";
+				blast_a1[6]="PDB";
+				try
+				{
+					new Blastp(blast_a1);
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
+				}
+				blast_a1=new String[11];
+				blast_a1[0]="/usr/local/ncbi/blast/bin/blastp";
+				blast_a1[1]="-query";
+				blast_a1[2]="/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab5/query.fa";
+				blast_a1[3]="-out";
+				blast_a1[4]="/Users/siwenwu/Downloads/result.txt";
+				blast_a1[5]="-db";
+				blast_a1[6]="PDB";
+				blast_a1[7]="-outfmt";
+				blast_a1[8]="6";
+				blast_a1[9]="-max_target_seqs";
+				blast_a1[10]="1";
+				try
+				{
+					new Blastp(blast_a1);
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
+				}
+				try
+				{
+					BufferedReader r1=new BufferedReader(new FileReader(new File("/Users/siwenwu/Downloads/result.txt")));
+					c="Input query: "+a+"\n";
+					c+="Result from blastp:"+"\n";
+					c+="qseqid"+"\t"+"sseqid"+"\t"+"pident"+"\t"+"length"+"\t"+"mismatch"+"\t"
+					+"gapopen"+"\t"+"qstart"+"\t"+"qend"+"\t"+"sstart"+"\t"+"send"+"\t"+"evalue"
+					+"\t"+"bitscore"+"\n";
+					for(String nextline=r1.readLine();nextline!=null;nextline=r1.readLine())
+					{
+						nextline=nextline.replace("\n","");
+						if(nextline!="")
+						{
+							c+=nextline+"\n";
+							a1="/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab5/"+nextline.split("\t")[1]+".jpeg";
+						}
+					}	
+					r1.close();
 					updatefield();
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
 				}
 			}
 		});
 		return panel;
 	}
 	
-	//Needleman-Wunsch global alignment algorithm.
-	private Map<String,String> myblast(String input)
+	private class Blastp
 	{
-		int gap=-6;
-		int match=4;
-		int mismatch=-4;
-		List<String> l=new ArrayList<>();
-		Map<String,String> mymap=new HashMap<String,String>();
-		Map<String,String> database1=new HashMap<String,String>();
-		for(String i:database.keySet())
+		public Blastp(String[] cmdArgs) throws Exception
 		{
-			String j=database.get(i);
-			database1.put(j,i);
+			Runtime r=Runtime.getRuntime();
+			Process p=r.exec(cmdArgs);
+			p.waitFor();
+			p.destroy();
 		}
-		int query_length=input.length();
-		int score=gap;
-		String query_change="";
-		String database_change="";
-		for(String i:database1.keySet())
-		{
-			int database_length=i.length();
-			int array [][]=new int[query_length][database_length];
-			String a=database1.get(i);
-			for(int x=0;x<query_length;x++)
-			{
-				array[x][0]=x*gap;
-			}
-			for(int x=0;x<database_length;x++)
-			{
-				array[0][x]=x*gap;
-			}
-			l.add(Integer.toString(score));
-			l.add(i);
-			l.add(query_change);
-			l.add(database_change);
-			l.add(a);
-			
-		}
-		String a1="/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab5/"+l.get(4)+".jpeg";
-		String c="Results:"+"\n"+"Query sequence: "+input+"\n"+"Best hit sequence in PDB: "
-		+l.get(1)+"\n"+"Best hit sequence's name in PDB: "+l.get(4)+"\n"+"Details of alignment: "+"\n"+l.get(2)+"(query sequence)"
-		+"\n"+l.get(3)+"(best hit sequence in PDB)"+"\n";
-		mymap.put(a1,c);
-		return mymap;
 	}
 	
 	private static Map<String,String> getDatabase() 

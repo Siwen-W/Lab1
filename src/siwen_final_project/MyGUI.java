@@ -103,7 +103,8 @@ public class MyGUI extends JFrame
 						String b=database.get(a);
 						if(b!=null) 
 						{
-							a1="/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab5/"+a+".jpeg";
+							a1="/Users/siwenwu/Documents/2020_fall/programming_3/javacode"
+								+"/Lab/src/siwen_final_project/protein_picture/"+a+".jpeg";
 							c="Results:"+"\n"+"Name in PDB: "+a+"\n"+"Sequence: "+b;
 						}
 						else
@@ -132,7 +133,9 @@ public class MyGUI extends JFrame
 				String a=input_field.getText();
 				try
 				{
-					BufferedWriter w=new BufferedWriter(new FileWriter("/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab5/query.fa"));
+					BufferedWriter w=new BufferedWriter(new FileWriter("/Users/siwenwu/"
+							+ "Documents/2020_fall/programming_3/javacode/Lab/src/"
+							+"siwen_final_project/query.fa"));
 					w.write(">"+"input_query"+"\n"+a+"\n");
 					w.flush();
 					w.close();
@@ -144,7 +147,8 @@ public class MyGUI extends JFrame
 				String[] blast_a1=new String[7];
 				blast_a1[0]="/usr/local/ncbi/blast/bin/makeblastdb";
 				blast_a1[1]="-in";
-				blast_a1[2]="/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab5/protein.fa";
+				blast_a1[2]="/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/"
+						+"siwen_final_project/protein.fa";
 				blast_a1[3]="-dbtype"; 
 				blast_a1[4]="prot";
 				blast_a1[5]="-out";
@@ -160,7 +164,8 @@ public class MyGUI extends JFrame
 				blast_a1=new String[11];
 				blast_a1[0]="/usr/local/ncbi/blast/bin/blastp";
 				blast_a1[1]="-query";
-				blast_a1[2]="/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab5/query.fa";
+				blast_a1[2]="/Users/siwenwu/Documents/2020_fall/programming_3"
+						+"/javacode/Lab/src/siwen_final_project/query.fa";
 				blast_a1[3]="-out";
 				blast_a1[4]="/Users/siwenwu/Downloads/result.txt";
 				blast_a1[5]="-db";
@@ -191,7 +196,8 @@ public class MyGUI extends JFrame
 						if(nextline!="")
 						{
 							c+=nextline+"\n";
-							a1="/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab5/"+nextline.split("\t")[1]+".jpeg";
+							a1="/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab"
+									+"/src/siwen_final_project/protein_picture/"+nextline.split("\t")[1]+".jpeg";
 						}
 					}	
 					r1.close();
@@ -222,7 +228,7 @@ public class MyGUI extends JFrame
 		Map<String,String> map=new HashMap<String,String>();
 		try
 		{
-			BufferedReader r=new BufferedReader(new FileReader(new File("/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/lab5/protein.fa")));
+			BufferedReader r=new BufferedReader(new FileReader(new File("/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/siwen_final_project/protein.fa")));
 			String header="";
 			for(String nextline=r.readLine();nextline!=null;nextline=r.readLine())
 			{

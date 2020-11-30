@@ -120,7 +120,7 @@ public class Prime_number extends JFrame
 				String s=input.getText();
 				int number=Integer.parseInt(s);
 				List<Integer> l=new ArrayList<>();
-				if(number==0 || number==1)
+				if(number<=1)
 				{
 					info="There is no prime number."+"\n";
 					updatefield();	

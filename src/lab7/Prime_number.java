@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -13,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 public class Prime_number extends JFrame
 {
@@ -106,6 +109,9 @@ public class Prime_number extends JFrame
 	
 	private class Mythread implements Runnable
 	{
+		private volatile boolean finished=false;
+		private volatile float time=0;
+		private int number1=0;
 		@Override
 		public void run() 
 		{
@@ -113,19 +119,33 @@ public class Prime_number extends JFrame
 			{
 				String s=input.getText();
 				int number=Integer.parseInt(s);
-				int time=0;
-				int number1=0;
 				List<Integer> l=new ArrayList<>();
 				if(number==0 || number==1)
 				{
 					info="There is no prime number."+"\n";
-					updatefield();
-					start.setEnabled(true);
-					ok.setEnabled(false);
-					cancel.setEnabled(false);	
+					updatefield();	
 				}
 				else
 				{
+					Timer timer=new Timer();
+					timer.schedule(new TimerTask() 
+					{
+						@Override
+						public void run() 
+						{
+							if(!finished)
+							{
+								time+=0.01;
+								info="Found "+number1+" prime numbers in "+String.format("%.2f",time)+" seconds."+"\n";
+								updatefield();
+							}
+							else
+							{
+								System.gc();
+								cancel();
+							}
+						}
+					},0,10);
 					int i=2;
 					while(i<=number && !cancelled)
 					{
@@ -134,16 +154,10 @@ public class Prime_number extends JFrame
 						{
 							l.add(r);
 							number1++;
-						}
-						info="Found "+number1+" prime numbers in "+time+" seconds."+"\n";
-						updatefield();
+						}	
 						i++;
-						time++;
-						Thread.sleep(1000);
 					}
-					start.setEnabled(true);
-					ok.setEnabled(false);
-					cancel.setEnabled(false);
+					finished=true;
 					info="";
 					for(int a=0;a<l.size();a++)
 					{
@@ -152,16 +166,32 @@ public class Prime_number extends JFrame
 					}
 					if(cancelled)
 					{
-						info+="Cancelled!"+"\n"+"Time = "+time+" seconds"+"\n";
+						info+="Cancelled!"+"\n"+"Time = "+String.format("%.2f",time)+" seconds"+"\n";
 						updatefield();
 					}
 					else
 					{
-						info+="Found all!"+"\n"+"Time = "+time+" seconds"+"\n";
+						info+="Found all!"+"\n"+"Time = "+String.format("%.2f",time)+" seconds"+"\n";
 						updatefield();
 					}
-				}
-				
+				}				
+			}
+			catch(Exception ex)
+			{
+				ex.printStackTrace();
+			}
+			try
+			{
+				SwingUtilities.invokeAndWait(new Runnable() 
+				{
+					@Override
+					public void run() 
+					{
+						start.setEnabled(true);
+						ok.setEnabled(false);
+						cancel.setEnabled(false);	
+					}
+				});
 			}
 			catch(Exception ex)
 			{

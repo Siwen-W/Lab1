@@ -143,6 +143,22 @@ public class Prime_number extends JFrame
 							{
 								System.gc();
 								cancel();
+								info="";
+								for(int a=0;a<l.size();a++)
+								{
+									int x=l.get(a);
+									info+=x+""+"\n";
+								}
+								if(cancelled)
+								{
+									info+="Cancelled!"+"\n"+"Time = "+String.format("%.2f",time)+" seconds"+"\n";
+									updatefield();
+								}
+								else
+								{
+									info+="Found all!"+"\n"+"Time = "+String.format("%.2f",time)+" seconds"+"\n";
+									updatefield();
+								}
 							}
 						}
 					},0,10);
@@ -158,22 +174,6 @@ public class Prime_number extends JFrame
 						i++;
 					}
 					finished=true;
-					info="";
-					for(int a=0;a<l.size();a++)
-					{
-						int x=l.get(a);
-						info+=x+""+"\n";
-					}
-					if(cancelled)
-					{
-						info+="Cancelled!"+"\n"+"Time = "+String.format("%.2f",time)+" seconds"+"\n";
-						updatefield();
-					}
-					else
-					{
-						info+="Found all!"+"\n"+"Time = "+String.format("%.2f",time)+" seconds"+"\n";
-						updatefield();
-					}
 				}				
 			}
 			catch(Exception ex)

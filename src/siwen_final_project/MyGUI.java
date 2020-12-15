@@ -11,7 +11,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
@@ -99,12 +101,13 @@ public class MyGUI extends JFrame
 					public void actionPerformed(ActionEvent e)
 					{
 						picture.setEnabled(true);
+						sequence.setEnabled(false);
 						String a=input_field.getText();
 						String b=database.get(a);
 						if(b!=null) 
 						{
 							a1="/Users/siwenwu/Documents/2020_fall/programming_3/javacode"
-								+"/Lab/src/siwen_final_project/protein_picture/"+a+".jpeg";
+								+"/Lab/src/siwen_final_project/picture_rename/"+a+".jpeg";
 							c="Results:"+"\n"+"Name in PDB: "+a+"\n"+"Sequence: "+b;
 						}
 						else
@@ -113,6 +116,7 @@ public class MyGUI extends JFrame
 							c="Results:"+"\n"+"The name "+a+" is not in PDB.";
 						}
 						updatefield();
+						sequence.setEnabled(true);
 					}
 				}
 		);
@@ -129,7 +133,8 @@ public class MyGUI extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				picture.setEnabled(true);
+				name.setEnabled(false);
+				picture.setEnabled(false);
 				String a=input_field.getText();
 				try
 				{
@@ -190,6 +195,7 @@ public class MyGUI extends JFrame
 					c+="qseqid"+"\t"+"sseqid"+"\t"+"pident"+"\t"+"length"+"\t"+"mismatch"+"\t"
 					+"gapopen"+"\t"+"qstart"+"\t"+"qend"+"\t"+"sstart"+"\t"+"send"+"\t"+"evalue"
 					+"\t"+"bitscore"+"\n";
+					String c1=c;
 					for(String nextline=r1.readLine();nextline!=null;nextline=r1.readLine())
 					{
 						nextline=nextline.replace("\n","");
@@ -197,9 +203,13 @@ public class MyGUI extends JFrame
 						{
 							c+=nextline+"\n";
 							a1="/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab"
-									+"/src/siwen_final_project/protein_picture/"+nextline.split("\t")[1]+".jpeg";
+									+"/src/siwen_final_project/picture_rename/"+nextline.split("\t")[1]+".jpeg";
 						}
 					}	
+					if(c1==c)
+					{
+						c+="Empty results from blastp."+"\n";
+					}
 					r1.close();
 					updatefield();
 				}
@@ -207,6 +217,8 @@ public class MyGUI extends JFrame
 				{
 					ex.printStackTrace();
 				}
+				picture.setEnabled(true);
+				name.setEnabled(true);
 			}
 		});
 		return panel;
@@ -225,7 +237,7 @@ public class MyGUI extends JFrame
 	
 	private static Map<String,String> getDatabase() 
 	{
-		Map<String,String> map=new HashMap<String,String>();
+		Map<String,String> map=new LinkedHashMap<>();
 		try
 		{
 			BufferedReader r=new BufferedReader(new FileReader(new File("/Users/siwenwu/Documents/2020_fall/programming_3/javacode/Lab/src/siwen_final_project/protein.fa")));
